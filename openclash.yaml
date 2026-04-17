@@ -232,7 +232,17 @@ proxy-groups:
   - name: 节点选择
     type: select
     proxies:
-      - 自己的节点名称 # 改成你自己的节点名称，可自定义
+      - racknerd-hy2
+      - Snippets-vless
+      - Snippets-vless 2
+      - Snippets-vless 3
+      - Snippets-vless 4
+      - Snippets-vless 5
+      - Snippets-vless 6
+      - Snippets-vless 7
+      - Snippets-vless 8
+      - Snippets-vless 9
+      - Snippets-vless 10
       - DIRECT
 
   - name: 国外服务
@@ -246,7 +256,7 @@ proxy-groups:
     type: select
     proxies:
       - 节点选择
-      - 自己的节点名称 # 改成你自己的节点名称，可自定义
+      - Snippets-vless 7
       - DIRECT
 
   - name: 流媒体
@@ -260,7 +270,7 @@ proxy-groups:
     type: select
     proxies:
       - 节点选择
-      - 自己的节点名称 # 改成你自己的节点名称，可自定义
+      - racknerd-hy2
       - DIRECT
 
 rules:
