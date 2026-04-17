@@ -1,0 +1,557 @@
+#---------------------------------------------------#
+## Mihomo (Clash Meta) 配置文件
+## 
+## 当前配置:
+## - Hysteria2/VMess/VLESS 代理
+## - TUN 模式支持
+## - 优化 DNS 解析
+## - 自动分流规则
+## - GeoIP 数据库支持
+##
+## 优化版本 - 2025-11-22
+#---------------------------------------------------#
+
+# 性能优化配置
+profile:
+  store-selected: true  # 记住手动选择的节点
+  store-fake-ip: true   # 持久化 fake-ip
+
+# TCP 并发连接
+tcp-concurrent: true
+
+# 统一延迟测试
+unified-delay: true
+
+# GeoIP 数据库配置
+geodata-mode: true
+geodata-loader: memconservative
+geo-auto-update: true  # 开启自动更新
+geo-update-interval: 24  # 每 24 小时检查更新
+
+# GeoIP 数据库下载地址
+geox-url:
+  geoip: "https://cdn.gh-proxy.org/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/GeoIP.dat"
+  geosite: "https://cdn.gh-proxy.org/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat"
+
+# 通用代理端口：同时支持HTTP和SOCKS5协议
+mixed-port: 7890
+
+# 仅HTTP协议专用端口
+port: 7891
+
+# 仅SOCKS5协议专用端口
+socks-port: 7892
+
+# 是否允许来自局域网的连接
+allow-lan: true
+
+# 监听地址，"*"表示监听所有地址
+bind-address: "*"
+
+# 运行模式：rule（规则模式）
+mode: rule
+
+# 日志级别：silent/error/warning/info/debug
+# 建议使用 info 或 warning 方便排查问题
+log-level: warning
+
+# 域名嗅探（Sniffer）- 提升分流准确性
+sniffer:
+  enable: true
+  sniff:
+    TLS:
+      ports: [443, 8443]
+    HTTP:
+      ports: [80, 8080-8880]
+      override-destination: true
+  skip-domain:
+    - 'Mijia Cloud'
+    - '+.push.apple.com'
+
+# 控制面板访问地址和端口
+external-controller: 0.0.0.0:9090
+
+# MetaCubeX 界面
+external-ui: ui
+
+# 访问控制面板的密码
+secret: "DingJie0925"
+
+# DNS 设置（优化版）
+dns:
+  enable: true
+  listen: 0.0.0.0:53
+  ipv6: false
+  prefer-h3: true
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.0/16
+  cache-size: 16384  # 增加 DNS 缓存大小（原 8192）
+  
+  # 基础 DNS 服务器（用于解析 DoH 服务器域名）
+  default-nameserver:
+    - 1.1.1.1          # Cloudflare
+    - 8.8.8.8          # Google
+  
+  # 国内 DNS（DoH 加密 + UDP 备份）
+  nameserver:
+    - https://doh.pub/dns-query           # 腾讯 DoH
+    - https://dns.alidns.com/dns-query    # 阿里 DoH
+
+  # 国外 DNS（用于国外域名解析）
+  fallback:
+    - https://1.1.1.1/dns-query      # Cloudflare DoH
+    - https://8.8.8.8/dns-query      # Google DoH
+    - tls://8.8.8.8:853              # Google DoT
+    - tls://1.1.1.1:853              # Cloudflare DoT
+
+  # Fake-IP 过滤器（只包含域名模式）
+  fake-ip-filter:
+    # Speedtest.net
+    - '*.speedtest.net'
+    - '*.ookla.com'
+    - '*.speedtestcustom.com'
+    # 本地域名
+    - '*.lan'
+    - '*.localdomain'
+    - '*.example'
+    - '*.invalid'
+    - '*.localhost'
+    - '*.test'
+    - '*.local'
+    - '*.home.arpa'
+    
+    # 时间服务
+    - 'time.*.com'
+    - 'time.*.gov'
+    - 'time.*.edu.cn'
+    - 'time.*.apple.com'
+    - 'time1.*.com'
+    - 'time2.*.com'
+    - 'time3.*.com'
+    - 'time4.*.com'
+    - 'time5.*.com'
+    - 'time6.*.com'
+    - 'time7.*.com'
+    - 'ntp.*.com'
+    - 'ntp1.*.com'
+    - 'ntp2.*.com'
+    - 'ntp3.*.com'
+    - 'ntp4.*.com'
+    - 'ntp5.*.com'
+    - 'ntp6.*.com'
+    - 'ntp7.*.com'
+    - '*.time.edu.cn'
+    - '*.ntp.org.cn'
+    - '+.pool.ntp.org'
+    - 'time1.cloud.tencent.com'
+    
+    # 音乐服务
+    - 'music.163.com'
+    - '*.music.163.com'
+    - '*.126.net'
+    - 'musicapi.taihe.com'
+    - 'music.taihe.com'
+    - 'songsearch.kugou.com'
+    - 'trackercdn.kugou.com'
+    - '*.kuwo.cn'
+    - 'api-jooxtt.sanook.com'
+    - 'api.joox.com'
+    - 'joox.com'
+    - 'y.qq.com'
+    - '*.y.qq.com'
+    - 'streamoc.music.tc.qq.com'
+    - 'mobileoc.music.tc.qq.com'
+    - 'isure.stream.qqmusic.qq.com'
+    - 'dl.stream.qqmusic.qq.com'
+    - 'aqqmusic.tc.qq.com'
+    - 'amobile.music.tc.qq.com'
+    - '*.xiami.com'
+    - '*.music.migu.cn'
+    - 'music.migu.cn'
+    
+    # Windows 连接测试
+    - '*.msftconnecttest.com'
+    - '*.msftncsi.com'
+    - 'msftconnecttest.com'
+    - 'msftncsi.com'
+    
+    # QQ 登录
+    - 'localhost.ptlogin2.qq.com'
+    - 'localhost.sec.qq.com'
+    
+    # 游戏平台
+    - '+.srv.nintendo.net'
+    - '+.stun.playstation.net'
+    - 'xbox.*.microsoft.com'
+    - 'xnotify.xboxlive.com'
+    - '+.battlenet.com.cn'
+    - '+.wotgame.cn'
+    - '+.wggames.cn'
+    - '+.wowsgame.cn'
+    - '+.wargaming.net'
+    - '*.square-enix.com'
+    - '*.finalfantasyxiv.com'
+    - '*.ffxiv.com'
+    
+    # 其他服务
+    - 'proxy.golang.org'
+    - 'stun.*.*'
+    - 'stun.*.*.*'
+    - '+.stun.*.*'
+    - '+.stun.*.*.*'
+    - '+.stun.*.*.*.*'
+    - 'heartbeat.belkin.com'
+    - '*.linksys.com'
+    - '*.linksyssmartwifi.com'
+    - '*.router.asus.com'
+    - 'mesu.apple.com'
+    - 'swscan.apple.com'
+    - 'swquery.apple.com'
+    - 'swdownload.apple.com'
+    - 'swcdn.apple.com'
+    - 'swdist.apple.com'
+    - 'lens.l.google.com'
+    - 'stun.l.google.com'
+    - '+.nflxvideo.net'
+    - '*.mcdn.bilivideo.cn'
+  
+  # DNS 分流规则
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+    ipcidr:
+      # 内网 IP 段
+      - 0.0.0.0/8
+      - 10.0.0.0/8
+      - 100.64.0.0/10
+      - 127.0.0.0/8
+      - 169.254.0.0/16
+      - 172.16.0.0/12
+      - 192.0.0.0/24
+      - 192.0.2.0/24
+      - 192.88.99.0/24
+      - 192.168.0.0/16
+      - 198.18.0.0/15
+      - 198.51.100.0/24
+      - 203.0.113.0/24
+      - 224.0.0.0/4
+      - 240.0.0.0/4
+      - 255.255.255.255/32
+    domain:
+      # 强制使用国外 DNS 解析的域名
+      - '+.google.com'
+      - '+.facebook.com'
+      - '+.youtube.com'
+      - '+.githubusercontent.com'
+      - '+.googlevideo.com'
+
+# TUN 模式设置（优化版）
+tun:
+  enable: true
+  stack: system
+  device: utun
+  auto-route: true
+  auto-detect-interface: true
+  dns-hijack:
+    - any:53
+  mtu: 1400
+  strict-route: true
+
+# 代理服务器设置
+proxies:
+  # Hysteria2 代理（高性能抗干扰协议）
+  - name: "racknerd-hy2"
+    type: hysteria2
+    server: "23.94.218.110" # 替换成您的服务器IP地址或域名
+    port: 56574
+    password: "50b86f2f"
+    up: 100   # 上传速度 (Mbps)
+    down: 1000  # 下载速度 (Mbps)
+    sni: www.bing.com
+    skip-cert-verify: true
+  - name: Snippets-vless
+    type: vless
+    server: mfa.gov.ua
+    port: 443
+    uuid: 3af99b55-601d-48b5-8942-c23d14b8e305
+    tls: true
+    servername: snsnip.nznd.eu.org
+    network: ws
+    ws-opts:
+      path: /?ed=2560
+      headers:
+        host: snsnip.nznd.eu.org
+    tfo: false
+    skip-cert-verify: true
+  - name: Snippets-vless 2
+    type: vless
+    server: saas.sin.fan
+    port: 443
+    uuid: 3af99b55-601d-48b5-8942-c23d14b8e305
+    tls: true
+    servername: snsnip.nznd.eu.org
+    network: ws
+    ws-opts:
+      path: /?ed=2560
+      headers:
+        host: snsnip.nznd.eu.org
+    tfo: false
+    skip-cert-verify: true
+  - name: Snippets-vless 3
+    type: vless
+    server: store.ubi.com
+    port: 443
+    uuid: 3af99b55-601d-48b5-8942-c23d14b8e305
+    tls: true
+    servername: snsnip.nznd.eu.org
+    network: ws
+    ws-opts:
+      path: /?ed=2560
+      headers:
+        host: snsnip.nznd.eu.org
+    tfo: false
+    skip-cert-verify: true
+  - name: Snippets-vless 4
+    type: vless
+    server: cf.130519.xyz
+    port: 443
+    uuid: 3af99b55-601d-48b5-8942-c23d14b8e305
+    tls: true
+    servername: snsnip.nznd.eu.org
+    network: ws
+    ws-opts:
+      path: /?ed=2560
+      headers:
+        host: snsnip.nznd.eu.org
+    tfo: false
+    skip-cert-verify: true
+  - name: Snippets-vless 5
+    type: vless
+    server: cf.008500.xyz
+    port: 443
+    uuid: 3af99b55-601d-48b5-8942-c23d14b8e305
+    tls: true
+    servername: snsnip.nznd.eu.org
+    network: ws
+    ws-opts:
+      path: /?ed=2560
+      headers:
+        host: snsnip.nznd.eu.org
+    tfo: false
+    skip-cert-verify: true
+  - name: Snippets-vless 6
+    type: vless
+    server: cf.090227.xyz
+    port: 443
+    uuid: 3af99b55-601d-48b5-8942-c23d14b8e305
+    tls: true
+    servername: snsnip.nznd.eu.org
+    network: ws
+    ws-opts:
+      path: /?ed=2560
+      headers:
+        host: snsnip.nznd.eu.org
+    tfo: false
+    skip-cert-verify: true
+  - name: Snippets-vless 7
+    type: vless
+    server: cf.877774.xyz
+    port: 443
+    uuid: 3af99b55-601d-48b5-8942-c23d14b8e305
+    tls: true
+    servername: snsnip.nznd.eu.org
+    network: ws
+    ws-opts:
+      path: /?ed=2560
+      headers:
+        host: snsnip.nznd.eu.org
+    tfo: false
+    skip-cert-verify: true
+  - name: Snippets-vless 8
+    type: vless
+    server: cdns.doon.eu.org
+    port: 443
+    uuid: 3af99b55-601d-48b5-8942-c23d14b8e305
+    tls: true
+    servername: snsnip.nznd.eu.org
+    network: ws
+    ws-opts:
+      path: /?ed=2560
+      headers:
+        host: snsnip.nznd.eu.org
+    tfo: false
+    skip-cert-verify: true
+  - name: Snippets-vless 9
+    type: vless
+    server: sub.danfeng.eu.org
+    port: 443
+    uuid: 3af99b55-601d-48b5-8942-c23d14b8e305
+    tls: true
+    servername: snsnip.nznd.eu.org
+    network: ws
+    ws-opts:
+      path: /?ed=2560
+      headers:
+        host: snsnip.nznd.eu.org
+    tfo: false
+    skip-cert-verify: true
+  - name: Snippets-vless 10
+    type: vless
+    server: cf.zhetengsha.eu.org
+    port: 443
+    uuid: 3af99b55-601d-48b5-8942-c23d14b8e305
+    tls: true
+    servername: snsnip.nznd.eu.org
+    network: ws
+    ws-opts:
+      path: /?ed=2560
+      headers:
+        host: snsnip.nznd.eu.org
+    tfo: false
+    skip-cert-verify: true
+# 代理组设置（优化版）
+proxy-groups:
+  # 主选择组
+  - name: Proxy
+    type: select
+    proxies:
+      - auto
+      - racknerd-hy2
+      - Snippets-vless
+      - Snippets-vless 2
+      - Snippets-vless 3
+      - Snippets-vless 4
+      - Snippets-vless 5
+      - Snippets-vless 6
+      - Snippets-vless 7
+      - Snippets-vless 8
+      - Snippets-vless 9
+      - Snippets-vless 10
+      - DIRECT
+
+  # 自动选择（延迟最低）
+  - name: auto
+    type: url-test
+    proxies:
+      - racknerd-hy2
+      - Snippets-vless
+      - Snippets-vless 2
+      - Snippets-vless 3
+      - Snippets-vless 4
+      - Snippets-vless 5
+      - Snippets-vless 6
+      - Snippets-vless 7
+      - Snippets-vless 8
+      - Snippets-vless 9
+      - Snippets-vless 10
+    url: 'https://www.gstatic.com/generate_204'
+    interval: 300
+    tolerance: 20
+
+# 规则集（优化版 - 使用本地路径）
+rule-providers:
+  apple-proxy:
+    type: http
+    behavior: classical
+    url: "https://cdn.jsdelivr.net/gh/Hackl0us/SS-Rule-Snippet@master/Rulesets/Clash/Basic/Apple-proxy.yaml"
+    path: ./ruleset/Apple-proxy.yaml
+    interval: 86400  # 每天更新一次
+
+  apple-direct:
+    type: http
+    behavior: classical
+    url: "https://cdn.jsdelivr.net/gh/Hackl0us/SS-Rule-Snippet@master/Rulesets/Clash/Basic/Apple-direct.yaml"
+    path: ./ruleset/Apple-direct.yaml
+    interval: 86400
+
+  cn:
+    type: http
+    behavior: classical
+    url: "https://cdn.jsdelivr.net/gh/Hackl0us/SS-Rule-Snippet@master/Rulesets/Clash/Basic/CN.yaml"
+    path: ./ruleset/CN.yaml
+    interval: 86400
+
+  ad-keyword:
+    type: http
+    behavior: classical
+    url: "https://cdn.jsdelivr.net/gh/Hackl0us/SS-Rule-Snippet@master/Rulesets/Clash/Basic/common-ad-keyword.yaml"
+    path: ./ruleset/common-ad-keyword.yaml
+    interval: 86400
+
+  foreign:
+    type: http
+    behavior: classical
+    url: "https://cdn.jsdelivr.net/gh/Hackl0us/SS-Rule-Snippet@master/Rulesets/Clash/Basic/foreign.yaml"
+    path: ./ruleset/foreign.yaml
+    interval: 86400
+
+  telegram:
+    type: http
+    behavior: classical
+    url: "https://cdn.jsdelivr.net/gh/Hackl0us/SS-Rule-Snippet@master/Rulesets/Clash/App/social/Telegram.yaml"
+    path: ./ruleset/Telegram.yaml
+    interval: 86400
+
+  lan:
+    type: http
+    behavior: classical
+    url: "https://cdn.jsdelivr.net/gh/Hackl0us/SS-Rule-Snippet@master/Rulesets/Clash/Basic/LAN.yaml"
+    path: ./ruleset/LAN.yaml
+    interval: 86400
+
+# 最终规则（优化顺序）
+rules:
+  # 1. 局域网直连（最常匹配，放在最前面）
+  - RULE-SET,lan,DIRECT
+  
+  # 2. 广告拦截（提前拦截，节省流量）
+  - RULE-SET,ad-keyword,REJECT
+  - GEOSITE,category-ads-all,REJECT  # GeoSite 广告拦截
+  
+  # 3. 特定应用规则
+  - GEOSITE,ookla-speedtest,DIRECT
+  - DOMAIN-SUFFIX,speedtest.net,DIRECT
+  - DOMAIN-SUFFIX,ookla.com,DIRECT
+  - DOMAIN-KEYWORD,speedtest,DIRECT
+  - RULE-SET,telegram,Proxy
+  - GEOSITE,telegram,Proxy  # GeoSite Telegram 规则
+  - GEOSITE,google,Proxy    # Google 服务走代理
+  - GEOSITE,github,Proxy    # GitHub 走代理
+  
+  # 4. 苹果服务分流
+  - RULE-SET,apple-direct,DIRECT
+  - RULE-SET,apple-proxy,Proxy
+  - GEOSITE,apple,DIRECT    # GeoSite 苹果服务
+  
+  # 5. 国内外网站分流
+  - RULE-SET,cn,DIRECT
+  - RULE-SET,foreign,Proxy
+  - GEOSITE,CN,DIRECT       # GeoSite 中国网站直连
+  - GEOSITE,geolocation-!cn,Proxy  # GeoSite 非中国网站走代理
+  
+  # 6. GeoIP 规则（中国IP直连）
+  - GEOIP,CN,DIRECT
+  
+  # 7. 默认规则（其他所有流量走代理）
+  - MATCH,Proxy
+
+#---------------------------------------------------#
+## 优化说明:
+##
+## 1. 添加了性能优化配置（profile, tcp-concurrent, unified-delay）
+## 2. 添加了 GeoIP 数据库配置
+## 3. 修复了 fake-ip-filter（移除了 IP 段）
+## 4. 优化了 DNS 配置（添加了更多 DoH 服务器）
+## 5. 完善了 TUN 模式配置
+## 6. 改进了代理组（添加了 auto 组）
+## 7. 优化了规则顺序（性能更好）
+## 8. 调整了日志级别为 info（方便排查问题）
+## 9. 规则集更新间隔改为 24 小时（86400 秒）
+##
+## 使用方法:
+## 1. 替换代理服务器中的 "ip" 为实际服务器地址
+## 2. 确保 GeoIP.dat 和 geosite.dat 文件在 config 目录下
+## 3. 确保规则集文件在 config/ruleset/ 目录下
+## 4. 访问 http://[IP]:9090/ui 使用控制面板
+## 5. 密码: wallentv
+#---------------------------------------------------#
