@@ -475,6 +475,18 @@ rules:
   - GEOSITE,netflix,流媒体
   - GEOSITE,disney,流媒体
 
+  # Telegram 官方推荐规则（需 GeoSite 库支持）
+  - GEOSITE,telegram,国外服务
+  - GEOIP,telegram,国外服务
+  
+  # 备用域名规则（兼容性兜底）
+  - DOMAIN-SUFFIX,telegram.org,国外服务
+  - DOMAIN-SUFFIX,t.me,国外服务
+  - DOMAIN-SUFFIX,telegram.me,国外服务
+  - DOMAIN-SUFFIX,cdn.telegram.org,国外服务
+  - DOMAIN-SUFFIX,userassets.telegram.org,国外服务
+  - DOMAIN-SUFFIX,contest.com,国外服务  # Telegram 活动域名
+  
   # CN 兜底
   - GEOSITE,apple-cn,DIRECT
   - DOMAIN-SUFFIX,microsoft.com,国外服务
